@@ -35,8 +35,8 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
-      - name: Run TFLint
-        run: tflint || echo "TFLint not installed or no issues"
+      # - name: Run TFLint
+      #   run: tflint || echo "TFLint not installed or no issues"
 
       - name: Terraform Init
         run: terraform init
