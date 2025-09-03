@@ -3,10 +3,6 @@ resource_group = {
     resource_group_name = "TODO-RG1"
     location            = "East US"
   }
-    "rg2" = {
-    resource_group_name = "TODO-RG2"
-    location            = "East US"
-  }
 }
 storage_account = {
   "stg1" = {
