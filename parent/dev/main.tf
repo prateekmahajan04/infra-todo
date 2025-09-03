@@ -2,11 +2,13 @@ module "RG" {
   source         = "../../child/azurerm_resource_group"
   resource_group = var.resource_group
 }
+
 module "storage_account" {
   source          = "../../child/azurerm_storage_account"
   storage_account = var.storage_account
   depends_on = [module.RG]
 }
+
 module "virtual_network" {
   source = "../../child/azurerm_virtual_network"
   vnet   = var.vnet
@@ -18,11 +20,13 @@ module "subnet" {
   subnet     = var.subnet
   depends_on = [ module.virtual_network]
 }
+
 module "pip" {
   source     = "../../child/azurerm_public_ip"
   pip        = var.pip
   depends_on = [module.RG]
 }
+
 module "nic" {
   source     = "../../child/azurerm_nic"
   nic        = var.nic
