@@ -12,6 +12,7 @@ jobs:
     name: Terraform Validate & Plan
     runs-on: self-hosted
     environment: dev
+    timeout-minutes: 20
 
     permissions:
       id-token: write
@@ -40,13 +41,16 @@ jobs:
         run: terraform validate
 
       - name: Terraform Plan
+        env:
+          TF_LOG: DEBUG
         run: terraform plan
 
   Terraform-apply:
     if: github.ref == 'refs/heads/main'
     name: Terraform Apply (Post Approval)
     runs-on: self-hosted
-    environment: dev
+    environment: dev   # <-- This triggers manual approval via environment protection
+    timeout-minutes: 30
 
     permissions:
       id-token: write
@@ -72,7 +76,14 @@ jobs:
         run: terraform init
 
       - name: Terraform Plan
+        env:
+          TF_LOG: DEBUG
         run: terraform plan -out=tfplan
 
+      - name: Terraform Show Plan
+        run: terraform show tfplan
+
       - name: Terraform Apply
+        env:
+          TF_LOG: DEBUG
         run: terraform apply -auto-approve tfplan
