@@ -5,13 +5,11 @@ module "RG" {
 module "storage_account" {
   source          = "../../child/azurerm_storage_account"
   storage_account = var.storage_account
-
   depends_on = [module.RG]
 }
 module "virtual_network" {
   source = "../../child/azurerm_virtual_network"
   vnet   = var.vnet
-
   depends_on = [module.RG]
 }
 
@@ -30,12 +28,12 @@ module "nic" {
   nic        = var.nic
   subnet     = var.subnet
   vnet       = var.vnet
-  depends_on = [module.pip]
+  depends_on = [module.pip, module.subnet]
 }
 
 module "vm" {
   source     = "../../child/azurerm_virtual_machine"
   vm         = var.vm
   nic        = var.nic
-  depends_on = [module.RG, module.nic, module.pip, module.virtual_network]
+  depends_on = [module.RG, module.nic]
 }
