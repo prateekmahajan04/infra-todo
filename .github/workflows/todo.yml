@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'main'
 
 jobs:
-  validate-plan:
+  Terraform-validate-plan:
+    if: startsWith(github.ref, 'refs/heads/feature/')
     name: Terraform Validate & Plan
     runs-on: self-hosted
     environment: dev
@@ -40,11 +42,11 @@ jobs:
       - name: Terraform Plan
         run: terraform plan
 
-  apply:
+  Terraform-apply:
+    if: github.ref == 'refs/heads/main'
     name: Terraform Apply (Post Approval)
     runs-on: self-hosted
     environment: dev
-    needs: validate-plan
 
     permissions:
       id-token: write
@@ -69,5 +71,8 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: Terraform Plan
+        run: terraform plan -out=tfplan
+
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve tfplan
