@@ -1,8 +1,6 @@
 module "RG" {
   source         = "../../child/azurerm_resource_group"
   resource_group = var.resource_group
-
-
 }
 module "storage_account" {
   source          = "../../child/azurerm_storage_account"
