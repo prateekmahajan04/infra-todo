@@ -1,17 +1,23 @@
 name: Terraform Deploy to Azure
 
 on:
+  pull_request:
+    branches:
+      - 'main'
+    types:
+      - opened
+      - synchronize
+      - reopened
+
   push:
     branches:
-      - 'feature/**'
       - 'main'
 
 jobs:
-  Terraform-validate-plan:
-    # if: startsWith(github.ref, 'refs/heads/feature/')
-    name: Terraform Validate & Plan
+  terraform-plan:
+    if: github.event_name == 'pull_request'
+    name: Terraform Plan on PR
     runs-on: self-hosted
-    environment: dev
     timeout-minutes: 20
 
     permissions:
@@ -19,41 +25,29 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Azure Login 
-        uses: azure/login@v1
+      - uses: azure/login@v1
         with:
           client-id: ${{ secrets.CLIENT_ID }}
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: 1.5.7
-      - name: Terraform installer
-        uses: autero1/action-terraform@v3.0.1
+      - uses: hashicorp/setup-terraform@v3
         with:
-          terraform-version: latest
+          terraform_version: 1.5.7
 
-      - name: Terraform Init
-        run: terraform init
+      - run: terraform init
 
-      - name: Terraform Validate
-        run: terraform validate
+      - run: terraform validate
 
-      - name: Terraform Plan
-        env:
-          TF_LOG: DEBUG
-        run: terraform plan
+      - run: terraform plan
 
-  Terraform-apply:
-    # if: github.ref == 'refs/heads/main'
-    name: Terraform Apply (Post Approval)
+  terraform-apply:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: Terraform Apply after merge to main
     runs-on: self-hosted
-    environment: dev   # <-- This triggers manual approval via environment protection
+    environment: dev   # <--- Manual approval required here (configure environment protection in repo settings)
     timeout-minutes: 30
 
     permissions:
@@ -61,37 +55,22 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Azure Login 
-        uses: azure/login@v1
+      - uses: azure/login@v1
         with:
           client-id: ${{ secrets.CLIENT_ID }}
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: 1.5.7
-      - name: Terraform installer
-        uses: autero1/action-terraform@v3.0.1
+      - uses: hashicorp/setup-terraform@v3
         with:
-          terraform-version: latest
-          
-      - name: Terraform Init
-        run: terraform init
+          terraform_version: 1.5.7
 
-      - name: Terraform Plan
-        env:
-          TF_LOG: DEBUG
-        run: terraform plan -out=tfplan
+      - run: terraform init
 
-      - name: Terraform Show Plan
-        run: terraform show tfplan
+      - run: terraform plan -out=tfplan
 
-      - name: Terraform Apply
-        env:
-          TF_LOG: DEBUG
-        run: terraform apply -auto-approve tfplan
+      - run: terraform show tfplan
+
+      - run: terraform apply -auto-approve tfplan
