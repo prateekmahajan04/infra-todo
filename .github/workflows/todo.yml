@@ -8,7 +8,7 @@ on:
 
 jobs:
   Terraform-validate-plan:
-    if: startsWith(github.ref, 'refs/heads/feature/')
+    # if: startsWith(github.ref, 'refs/heads/feature/')
     name: Terraform Validate & Plan
     runs-on: self-hosted
     environment: dev
@@ -50,7 +50,7 @@ jobs:
         run: terraform plan
 
   Terraform-apply:
-    if: github.ref == 'refs/heads/main'
+    # if: github.ref == 'refs/heads/main'
     name: Terraform Apply (Post Approval)
     runs-on: self-hosted
     environment: dev   # <-- This triggers manual approval via environment protection
