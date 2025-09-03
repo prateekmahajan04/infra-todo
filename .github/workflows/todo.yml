@@ -29,10 +29,14 @@ jobs:
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: 1.5.7
+      - name: Terraform installer
+        uses: autero1/action-terraform@v3.0.1
         with:
-          terraform_version: 1.5.7
+          terraform-version: latest
 
       - name: Terraform Init
         run: terraform init
@@ -67,11 +71,15 @@ jobs:
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v3
+      #   with:
+      #     terraform_version: 1.5.7
+      - name: Terraform installer
+        uses: autero1/action-terraform@v3.0.1
         with:
-          terraform_version: 1.5.7
-
+          terraform-version: latest
+          
       - name: Terraform Init
         run: terraform init
 
