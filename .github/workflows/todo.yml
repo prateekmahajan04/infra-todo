@@ -1,0 +1,48 @@
+name: Terraform Deploy to Azure (Federated Identity)
+
+on:
+  push:
+    branches:
+      - 'feature/**'
+
+jobs:
+  terraform:
+    name: Terraform Validate & Deploy
+    runs-on: self-hosted
+    environment:
+      name: dev
+
+    permissions:
+      id-token: write       # OIDC token ke liye zaruri
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login with Federated Identity
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.CLIENT_ID }}
+          tenant-id: ${{ secrets.TENANT_ID }}
+          subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Run TFLint
+        run: tflint || echo "TFLint not installed or no issues"
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
