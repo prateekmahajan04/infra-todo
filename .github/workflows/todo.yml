@@ -8,7 +8,7 @@ on:
 
 jobs:
   Terraform-validate-plan:
-    # if: startsWith(github.ref, 'refs/heads/feature/')
+    if: startsWith(github.ref, 'refs/heads/feature/')
     name: Terraform Validate & Plan
     runs-on: self-hosted
     environment: dev
@@ -29,10 +29,6 @@ jobs:
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: 1.5.7
       - name: Terraform installer
         uses: autero1/action-terraform@v3.0.1
         with:
@@ -50,10 +46,10 @@ jobs:
         run: terraform plan
 
   Terraform-apply:
-    # if: github.ref == 'refs/heads/main'
-    name: Terraform Apply (Post Approval)
+    if: github.ref == 'refs/heads/main'
+    name: Terraform Apply
     runs-on: self-hosted
-    environment: dev   # <-- This triggers manual approval via environment protection
+    environment: dev   
     timeout-minutes: 30
 
     permissions:
@@ -71,10 +67,6 @@ jobs:
           tenant-id: ${{ secrets.TENANT_ID }}
           subscription-id: ${{ secrets.SUBSCRIPTION_ID }}
 
-      # - name: Setup Terraform
-      #   uses: hashicorp/setup-terraform@v3
-      #   with:
-      #     terraform_version: 1.5.7
       - name: Terraform installer
         uses: autero1/action-terraform@v3.0.1
         with:
@@ -88,10 +80,7 @@ jobs:
           TF_LOG: DEBUG
         run: terraform plan -out=tfplan
 
-      - name: Terraform Show Plan
-        run: terraform show tfplan
-
       - name: Terraform Apply
         env:
           TF_LOG: DEBUG
-        run: terraform apply -auto-approve tfplan
+        run: terraform apply -auto-approve
